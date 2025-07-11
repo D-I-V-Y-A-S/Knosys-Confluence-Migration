@@ -249,7 +249,7 @@ def attach_file(page_id, file_path, file_name):
     upload_url = f"{confluence_url}/content/{page_id}/child/attachment"
     
     headers_no_json = {
-        "X-Atlassian-Token": "no-check",  # prevents XSRF check
+        "X-Atlassian-Token": "no-check", 
         "Accept": "application/json"
     }
     with open(file_path, "rb") as f:
