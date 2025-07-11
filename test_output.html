@@ -1,0 +1,181 @@
+<html><body><ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">PageTop</ac:parameter></ac:structured-macro>
+<p>This page includes the steps, business rules and scripting to manage a <strong>Growth Conversation</strong>. It's for <strong>all Experts </strong>/ <strong>Consultants</strong>.</p>
+<ul>
+<li>For <strong>CoEx Tech Support</strong>, refer to <ac:link><ri:page ri:content-title="Growth within CoEx Tech Support" ri:space-key="MD"></ri:page><ac:plain-text-link-body></ac:plain-text-link-body></ac:link></li>
+<li>For information on Call monitoring and recording scripting, refer to <ac:link><ri:page ri:content-title="Call monitoring &amp; recording (incl. MFA) scripting | Inbound &amp; Outbound" ri:space-key="MD"></ri:page><ac:plain-text-link-body></ac:plain-text-link-body></ac:link></li>
+<li>For an outline on how to check if a Messaging customer is a Repeat Contact, see <ac:link><ri:page ri:content-title="Repeat Check | Guidelines &amp; scenario matrix | Service Messaging" ri:space-key="MD"></ri:page><ac:plain-text-link-body></ac:plain-text-link-body></ac:link></li>
+<li>For an outline on how to check if a Voice customer is a Same Issue Repeat Contact, see <ac:link><ri:page ri:content-title="Repeat Check | Guidelines &amp; scenario matrix | Service Voice" ri:space-key="MD"></ri:page><ac:plain-text-link-body></ac:plain-text-link-body></ac:link></li>
+<li>For guidance on how to meet customer needs based on the red, yellow and green traffic light scenarios, see the <ac:link><ri:page ri:content-title="Signature Contact Flow | Manage conversation with traffic light scenarios | Service" ri:space-key="MD"></ri:page><ac:plain-text-link-body></ac:plain-text-link-body></ac:link></li>
+</ul>
+<ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:content-title="Heading | Before you start | Standard" ri:space-key="sharedcont"></ri:page></ac:link></ac:parameter></ac:structured-macro>
+<ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">processes</ac:parameter></ac:structured-macro>
+<p>Before you start a Growth Conversation, familiarise yourself with the business rules below.</p>
+<p class="alt3" style="color: red;"><strong>Important business rules:</strong></p>
+<ul>
+<li>During a call that is not sales related (e.g. the customer is contacting us about technical or billing issues, has a complaint or asking about a service or product, or is requesting a cancellation), you must obtain the customer's consent before you can start a Growth Conversation. Follow the <a href="#high">process below</a></li>
+<li>If the customer doesn't consent to a Growth Conversation, you must still open their account in JARVIS to solve the issue, but you can't have a sales conversation or do an account review (except where the account review is specifically required to resolve the issue)</li>
+<li>If you know the customer has already been asked about an account review and declined before their interaction with you, <strong>don't seek their consent again</strong> until the customer's enquiry or complaint has been resolved during the same interaction with you</li>
+<li>If the customer mentions a <strong><span style="color: #80276c">vulnerability </span></strong>(For example, Domestic and Family abuse), <strong>don't proceed</strong> with an account review discussion even if you have consent. Refer to the <ac:link><ri:page ri:content-title="Vulnerable customers matrix" ri:space-key="MD"></ri:page><ac:plain-text-link-body></ac:plain-text-link-body></ac:link></li>
+<li>If the customer doesn't provide a clear Yes / No to any of the above, <strong>don't proceed</strong> with the Growth Conversation</li>
+<li>If the customer requests a callback, make a commitment to contact them at their preferred date &amp; time. During this callback, you must only discuss products and offers the customer initially enquired about</li>
+<li>If the customer doesn't want to discuss the growth solution, you may ask, <strong>if appropriate</strong>, whether they would like you to share this information with them via SMS or email so they can review it later. Only send the details if the customer provides clear consent. At no point should you call a customer with an unsolicited sales offer or similar information to conduct a subsequent sales conversation</li>
+<li>Don't change the customer's existing marketing preferences <strong>unless specifically requested by the customer</strong></li>
+</ul>
+<ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">high</ac:parameter></ac:structured-macro>
+<h3>High-level process</h3>
+<p>Click to reveal details.</p>
+<table border="1pt solid #ffffff" data-layout="default" style="width: 100%">
+<tbody>
+<tr>
+<td data-highlight-colour="#00a3ad" style="border:1.33px solid #ffffff; width:73.6562px; background-image:initial; background-size:initial; background-repeat:initial; background-attachment:initial; background-origin:initial; background-clip:initial; background-color:#00a3ad; vertical-align:top; text-align:left; padding:7.56px;">
+<p><a href="#s1"><span style="color: #ffffff; font-family: arial, helvetica, sans-serif"><span style="font-size: 14px"><strong>Step 1: </strong></span></span></a></p>
+<p><a href="#s1"><span style="color: #ffffff; font-family: arial, helvetica, sans-serif"><span style="font-size: 14px"><strong>Ask for consent for Growth Conversation / to review account</strong></span></span></a></p>
+</td>
+<td data-highlight-colour="#006280" style="border:1.33px solid #ffffff; width:73.6562px; background-image:initial; background-size:initial; background-repeat:initial; background-attachment:initial; background-origin:initial; background-clip:initial; background-color:#006280; vertical-align:top; text-align:left; padding:7.56px;">
+<p><a href="#s2"><span style="font-size: 14px; font-family: arial, helvetica, sans-serif; color: #ffffff"><strong>Step 2:</strong></span></a></p>
+<p><a href="#s2"><span style="font-size: 14px; font-family: arial, helvetica, sans-serif; color: #ffffff"><strong>Customer consent gained</strong></span></a></p>
+</td>
+<td data-highlight-colour="#00323a" style="border:1.33px solid #ffffff; width:73.6562px; background-image:initial; background-size:initial; background-repeat:initial; background-attachment:initial; background-origin:initial; background-clip:initial; background-color:#00323a; vertical-align:top; text-align:left; padding:7.56px;">
+<p><a href="#s3"><span style="font-size: 14px; font-family: arial, helvetica, sans-serif; color: #ffffff"><strong>Step 3:</strong></span></a></p>
+<p><a href="#s3"><span style="font-size: 14px; font-family: arial, helvetica, sans-serif; color: #ffffff"><strong>Customer consent not gained</strong></span></a></p>
+</td>
+<td data-highlight-colour="#ffa100" style="border:1.33px solid #ffffff; width:73.6562px; background-image:initial; background-size:initial; background-repeat:initial; background-attachment:initial; background-origin:initial; background-clip:initial; background-color:#ffa100; vertical-align:top; text-align:left; padding:7.56px;">
+<p><a href="#s4"><span style="font-size: 14px; font-family: arial, helvetica, sans-serif; color: #ffffff"><strong>Step 4:</strong></span></a></p>
+<p><a href="#s4"><span style="font-size: 14px; font-family: arial, helvetica, sans-serif; color: #ffffff"><strong>Add a note</strong></span></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:content-title="Heading | Quick steps | Standard" ri:space-key="sharedcont"></ri:page></ac:link></ac:parameter></ac:structured-macro>
+<ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">s1</ac:parameter></ac:structured-macro>
+<h3>Step 1: Ask for consent to have Growth Conversation / conduct an account review</h3>
+<p>Ask the customer if they'd like you to conduct an <ac:link><ri:page ri:content-title="account review" ri:space-key="TC1"></ri:page><ac:plain-text-link-body></ac:plain-text-link-body></ac:link>.</p>
+<table data-layout="default" style="border-collapse: collapse">
+<thead>
+<tr>
+<td style="width: 50%; text-align: center">You must...</td>
+<td style="width: 50%; text-align: center">You can't...</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="width: 50%; vertical-align: top">
+<p><strong>All Experts / Consultants</strong></p>
+<ul>
+<li><span style="font-style: italic;"><strong>Ask</strong></span> the customer for consent to conduct an account review <span style="font-style: italic;"><strong>before</strong></span> discussing any offers</li>
+<li>Allow the customer to provide a clear Yes / No before proceeding to discuss any offers​</li>
+<li>Don't ask again if customer declines. If customer is unsure / no response, you may only <span style="font-style: italic;"><strong>ask</strong></span> for consent to conduct an account review maximum of 2 times during the conversation</li>
+<li>Only provide solutions that relate to the customer's initial enquiry if the customer has declined an account review</li>
+</ul>
+</td>
+<td style="width: 50%">
+<p><strong>All Experts / Consultants</strong></p>
+<ul>
+<li>Discuss any offers or conduct a Growth Conversation with the customer without capturing consent</li>
+<li>Discuss any offers or conduct a Growth Conversation with the customer if they have declined the account review</li>
+<li>Call a customer with an unsolicited sales offer or similar information</li>
+<li>Email / SMS a customer with an unsolicited sales offer or similar information for the purpose of conducting a sales conversation without capturing consent to do so</li>
+<li>Make any changes to the customer's existing marketing preferences unless the customer has specifically requested an update</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<h4><span style="color: #ffa100">Scripting examples</span></h4>
+<p>Scripting examples are recommended as they include preferred language</p>
+<p><strong>Note. Account review scripting mustn't include any mention of products, offers or potential cost savings.</strong></p>
+<table data-layout="default" style="height: 288px;  border-collapse: collapse">
+<thead>
+<tr style="height: 15px">
+<td style="width: 100%; height: 15px">Recommended script examples</td>
+</tr>
+</thead>
+<tbody>
+<tr style="height: 39px">
+<td style="width: 100%; height: 39px">
+<p><span style="font-style: italic;">Whilst I get [insert initial enquiry] resolved for you, can I conduct an account review to ensure you’re getting the best solutions available to you?</span></p>
+</td>
+</tr>
+<tr style="height: 39px">
+<td style="width: 100%; height: 39px">
+<p><span style="font-style: italic;"> I am happy to assist you with [insert initial enquiry]. After this is resolved, would it be OK for me to review your account to see if there are any other products or services that might suit your needs?</span></p>
+</td>
+</tr>
+<tr>
+<td style="width: 100%">
+<p><span style="font-style: italic;"> We'll take care of your current enquiry first, and after that, I'd like to share a few offers that might make your experience with us even better. Is that OK?</span></p>
+</td>
+</tr>
+<tr>
+<td style="width: 100%">
+<p><span style="font-style: italic;"> I'll focus on helping you with your main question first. Once that's sorted, may I check if there's anything else we can offer that could be a great fit for you too?</span></p>
+</td>
+</tr>
+<tr>
+<td style="width: 100%">
+<p><span style="font-style: italic;"> First, let's focus on fixing the issue you've called about today - that's the most important thing. Afterwards, may I also highlight some other offers to get even more out of your current setup?</span></p>
+</td>
+</tr>
+<tr>
+<td style="width: 100%">
+<p><span style="font-style: italic;">I'm pleased to assist you with [query]. Once this is taken care of, may I review your account to see if there are any other products or services that could be useful for you?</span></p>
+</td>
+</tr>
+<tr>
+<td style="width: 100%">
+<p><span style="font-style: italic;">I'm happy I could help with [insert initial enquiry]. While I have you, can I take a moment to review your account to see if you might benefit from other products and services that we have on offer? </span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Checklist for what a good consent question should include:</strong></p>
+<p><ac:task-list><ac:task><ac:task-status>incomplete</ac:task-status><ac:task-body>A tailored consent question will correlate to the customer's primary enquiry</ac:task-body></ac:task><ac:task><ac:task-status>incomplete</ac:task-status><ac:task-body>Customer should be aware we intend to introduce another conversation that will be of benefit to them</ac:task-body></ac:task><ac:task><ac:task-status>incomplete</ac:task-status><ac:task-body>It should be framed as a question to allow the customer to choose whether they would like an account review to be completed</ac:task-body></ac:task><ac:task><ac:task-status>incomplete</ac:task-status><ac:task-body>If the customer is clearly agitated, wanting their issue resolved urgently or in a bad mood, don't ask to have a Growth Conversation or do an account review unless it is directly related to solving their enquiry, issue or complaint.</ac:task-body></ac:task></ac:task-list></p>
+<h4><span style="color: #ffa100">Customer consent gained?</span></h4>
+<ul>
+<li><strong>Yes</strong>: Go to <strong>Step 2</strong></li>
+<li><strong>No</strong>: Go to <strong>Step 3</strong></li>
+</ul>
+<ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">s2</ac:parameter></ac:structured-macro>
+<h3>Step 2: Customer consent gained to review account</h3>
+<p>After conducting an account review, establish if there's an opportunity for a growth discussion with an appropriate solution for the issue experienced (e.g. serviceability checks support a better connectivity solution, speed pack, etc):</p>
+<h4><span style="color: #ffa100">Is there a growth discussion opportunity?</span></h4>
+<ul>
+<li><strong>Yes</strong>: Continue to offer solutions using the LEAD framework</li>
+<li><strong>No</strong>: Continue to assist the customer with further troubleshooting and options. If you identify a growth opportunity after further discussion, offer the solution</li>
+</ul>
+<p>Go to <strong>Step 4</strong>.</p>
+<ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">s3</ac:parameter></ac:structured-macro>
+<h3></h3>
+<h3><strong>Step 3: Customer consent </strong><strong style="color: inherit">not gained </strong><strong>to review account</strong></h3>
+<table data-layout="default" style="width: 100%">
+<tbody>
+<tr>
+<td data-highlight-colour="#e3e9ec" style="background-color:#e3e9ec; vertical-align:top;">
+<p class="alt3" style="color: red;"><span><strong>Important:</strong></span></p>
+<ul>
+<li>You may only <span style="font-style: italic;"><strong>ask</strong></span> for consent to conduct an account review <span style="font-style: italic;"><strong>a maximum of 2 times</strong></span> during the entire conversation and you should only ask a second time if the customer didn't clearly decline the first time</li>
+<li>Final check for customer consent can only be completed <strong><span style="font-style: italic;">when</span> appropriate to do so</strong> - you mustn't impact the customer experience</li>
+<li>After following all steps detailed above, if the customer declines an account review again, you must end the conversation</li>
+<li>You <span style="font-style: italic;"><strong>must</strong></span> ensure that all our Growth Conversations follow the guidelines to avoid pushy or aggressive selling techniques</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<h4><strong><span style="color: #ffa100">Follow the below:</span></strong></h4>
+<ol style="list-style-type: lower-alpha">
+<li>You must resolve their initial enquiry end to end. (Refer to the relevant process in Circle)</li>
+<li>The customer must be happy with the resolution provided to the initial enquiry</li>
+<li>Once you have successfully resolved the customer's initial enquiry and <span data-contrast="none" data-usefontface="false">the customer is happy,</span><span><u>​</u> y</span>ou can check for customer consent <strong><span style="font-style: italic;">once</span></strong> more for an account review. You must use <span style="font-style: italic;"><strong>verbatim</strong></span> the scripting below:<span style="font-style: italic;">Thank you [insert customer's name]. I have successfully resolved [insert customer's initial enquiry]. Whilst I have you, would you like me to review your account to ensure you are getting the best value from your services?</span><span style="font-family: Arial, sans-serif; font-size: 12px"><span style="font-style: italic;">​</span></span></li>
+</ol>
+<h4><span style="color: #ffa100">Customer consent gained?</span></h4>
+<ul>
+<li><strong>Yes</strong>: P<span data-contrast="none" data-usefontface="false">roceed with account review. </span>Go to <strong>Step 2</strong></li>
+<li><strong>No</strong>: W<span data-contrast="none" data-usefontface="false">rap up &amp; end conversation.Go to <strong>Step 4</strong></span></li>
+</ul>
+<ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">s4</ac:parameter></ac:structured-macro>
+<h3>Step 4: Add a note</h3>
+<p>Add a note in JARVIS.</p>
+<ac:structured-macro ac:name="expand"><ac:parameter ac:name="title">Add notes</ac:parameter><ac:rich-text-body><ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:content-title="Add notes" ri:space-key="sharedcont"></ri:page></ac:link></ac:parameter></ac:structured-macro></ac:rich-text-body></ac:structured-macro>
+<p style="text-align: right"><a href="#PageTop">Back to Top</a></p>
+</body></html>

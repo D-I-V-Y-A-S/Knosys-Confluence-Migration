@@ -21,7 +21,8 @@ space_key=os.getenv("space_key")
 shared_paragraph_space_key=os.getenv("shared_paragraph_space_key")
 image_hub_space_key=os.getenv("image_hub_space_key")
 conf_doc_page=os.getenv("Base_url")
-tooltip_space_key=os.getenv("tooltip_space_key")
+tooltip_space_key=os.getenv("tooltip_space")
+
 #credentials for authentication
 BASE_URL = "https://rest.opt.knoiq.co/api/v1"
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
@@ -71,12 +72,11 @@ def get_auth_token(challenge_token, signature):
         response = requests.post(url, json=payload, headers=headers, verify=False)
         if response.status_code == 200:
             auth_token = response.json().get("token")
-            print(auth_token)
+            # print(auth_token)
             print("[:white_tick:] Authentication successful! Token received.")
-            return auth_token
-    
+            return auth_token 
         else:
-            print("[:x:] Authentication failed:", response.text)
+            print("[:x:] Authentication failed:")
             return None
     except Exception as e:
         print(e)
@@ -197,6 +197,7 @@ def color_formatter(html_content):
 
 def get_page_by_title(space_key,title):
     try:
+        title=title.strip().strip('"')
         url = f"{confluence_url}/content"
         params = {
             "spaceKey": space_key,
@@ -205,11 +206,7 @@ def get_page_by_title(space_key,title):
         }
         response = requests.get(url, headers=headers, auth=auth, params=params)
         if response.status_code == 200 and response.json()["size"] > 0:
-            # print(response.status_code,"-->",response.text)
-            print("Page Title fetched!")
             return response.json()["results"][0]
-        else:
-            print(response.status_code,"-->",response.text)
     except Exception as E:
         print(E)
 
@@ -219,12 +216,10 @@ def get_current_version(page_id):
     if resp.status_code == 200:
         return resp.json()['version']['number']
     else:
-        print(f"Failed to get page version: {resp.status_code} - {resp.text}")
         return None
     
 def create_page(space_key, title, content):
     url = f"{confluence_url}/content"
-    print(url,space_key, title, content)
     data = {
         "version": {
         "number": 1
@@ -243,18 +238,13 @@ def create_page(space_key, title, content):
         response = requests.post(url, headers=headers, auth=auth, data=json.dumps(data))
         if(response.status_code==200):
             response_json = response.json()
-            # print(response.status_code,"-->",response.text)
             created_page_Id=response_json.get("id")
             return created_page_Id
-        else:
-            print("wrong")
-            print(response.status_code,"-->",response.text)
     except Exception as e:
         print(e)
 
 def attach_file(page_id, file_path, file_name):
     if file_name == "2e6d82ef-524c-ea11-a960-000d3ad095fb.png":
-        print(f"Skipped upload for unwanted image: {file_name}")
         return None
     upload_url = f"{confluence_url}/content/{page_id}/child/attachment"
     
@@ -269,10 +259,8 @@ def attach_file(page_id, file_path, file_name):
         response = requests.post(upload_url, headers=headers_no_json, auth=auth, files=files)
     try:
         if response.status_code == 200 or response.status_code == 201:
-            print(f"Uploaded: {file_name}")
             return response.json()
         else:
-            print(f"Failed to upload {file_name}: {response.status_code} - {response.text}")
             return None
     except Exception as E:
         print(e)
@@ -293,12 +281,10 @@ def update_page(page_id, title, html_content, current_version):
             }
         }
         response = requests.put(url, headers=headers, auth=auth, data=json.dumps(data))
-        print(response.status_code)
         if(response.status_code == 200):
-            # print(response.status_code,"-->",response.text)
-            print("page updated")
+            print("page updated successfully!")
         else:
-            print(response.status_code,"-->",response.text)
+            print("Page not updated!")
         return None
     except Exception as E:
         print(E)
@@ -307,29 +293,17 @@ external_info_list = data.get("external", {}).get("information", [])
 info_lookup = {item["informationId"]: item for item in external_info_list if "informationId" in item}
 
 def generate_image_macro_img(filename):
-    if filename == "2e6d82ef-524c-ea11-a960-000d3ad095fb.png":
-        print(f"Skipped macro generation for: {filename}")
-        return " "
-#     return f'''
-# <ac:image>
-#   <ri:attachment ri:filename="{filename}"/>
-# </ac:image>
-# '''.strip()
+        print(filename)
+        if filename == "2e6d82ef-524c-ea11-a960-000d3ad095fb.png":
+           return " "
+        return f'<p><ac:image ac:width="300" ><ri:attachment ri:filename="{filename}" /></ac:image></p>'
     
-
+    
 def generate_image_macro_img_1(filename):
-    print("filename123",filename)
+    print(filename,"yep")
     if filename == "2e6d82ef-524c-ea11-a960-000d3ad095fb.png":
-        print(f"Skipped macro generation for: {filename}")
         return " "
-    print("filename123",filename)
-    return f'''<p>
-<ac:image>
-  <ri:attachment ri:filename="{filename}"/>
-</ac:image></p>
-'''
-# .strip()
-# ac:original-height="600" ac:original-width="800" ac:inline="true" ac:alt="example.png"
+    return f'<p><ac:image><ri:attachment ri:filename="{filename}"/></ac:image></p>'
 image_title_map={}
 def get_tooltip_panel_content(external_id):
     try:
@@ -343,7 +317,6 @@ def get_tooltip_panel_content(external_id):
          for field in entry["fields"]:
             if field.get("name") == "Text":
                 content = field.get("value", "")
-
 
         def fetch_and_save_image(item_id):
             url = f'https://rest.opt.knoiq.co/api/v2/resources/images/{item_id}'
@@ -367,7 +340,6 @@ def get_tooltip_panel_content(external_id):
                     image_title_map[item_id] = entry.get("title", item_id)
                     filepath = fetch_and_save_image(item_id)
                     if filepath:
-                        print("get_tooltip_panel_content")
                         return generate_image_macro_img_1(os.path.basename(filepath))
             return None
 
@@ -383,13 +355,6 @@ def get_tooltip_panel_content(external_id):
                         return generate_image_macro_img_1(os.path.basename(filepath))
 
             title = entry.get("title", "Untitled")
-            # print("title12340",title)
-            # page_id=get_page_by_title(space_key,title)
-            # if not page_id:
-            #     content_with_macros = download_images_from_html_and_update_content(content)
-            #     cleaned_content = color_formatter(content_with_macros)
-            #     create_page(tooltip_space_key, title, cleaned_content)
-            # return f"{title}\n{content}"
             return content
 
         return None
@@ -408,38 +373,73 @@ def highlight_externalid(html_content):
             for tag in soup.find_all(["script", "style"]):
                 tag.decompose()
             return str(soup).strip()
+        # def repl(match):
+        #     full_tag, external_id, inner_text = match.group(1), match.group(2), match.group(3)
+        #     result = get_tooltip_panel_content(external_id)
+        #     if not result:
+        #         return match.group(0)
+        #     if not inner_text and result.strip().startswith("<ac:image"):
+        #         return result
+        #     if inner_text and result.strip().startswith("<ac:image"):
+        #         return f"{inner_text}{result}"
+        #     tooltip_text = html_to_tooltip_text(result)
+        #     cleaned_text = tooltip_text.replace("<em>", "").replace("</em>", "").replace("'", "")
+
+        #     def generate_id(length=8):
+        #         return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+
+        #     outer_local_id = generate_id()
+        #     outer_macro_id = generate_id()
+        #     inner_local_id = generate_id()
+        #     inner_macro_id = generate_id()
+
+        #     def extract_image_title_from_macro(cleaned_text, image_title_map):
+        #         soup = BeautifulSoup(cleaned_text, "html.parser")
+        #         ri_tag = soup.find("ri:attachment")
+        #         if ri_tag and ri_tag.get("ri:filename"):
+        #             filename = ri_tag["ri:filename"]
+        #             item_id = filename.replace(".png", "")
+        #             return image_title_map.get(item_id, item_id)
+        #         return None
+        #     cleaned_text=sync_hidden_links_with_shared_pages_using_data(cleaned_text,data)
+        #     if "<ac:image" in cleaned_text:
+        #         inner_text = extract_image_title_from_macro(cleaned_text, image_title_map)
+        #     page=get_page_by_title(tooltip_space_key,inner_text)
+        #     if not page:
+        #         page_id=create_page(tooltip_space_key,inner_text,cleaned_text)
+        #     return f'<ac:link><ri:page ri:content-title="{inner_text.strip()}" ri:space-key={tooltip_space_key} /><ac:plain-text-link-body><![CDATA[{inner_text}]]></ac:plain-text-link-body></ac:link>'
+
+            # return f'''<ac:structured-macro ac:name="rw-ui-tabs-macro" ac:schema-version="1" data-layout="default" ac:local-id="{outer_local_id}" ac:macro-id="{outer_macro_id}">
+            # <ac:rich-text-body>
+            # <ac:structured-macro ac:name="rw-tab" ac:schema-version="1" data-layout="default" ac:local-id="{inner_local_id}" ac:macro-id="{inner_macro_id}">
+            # <ac:parameter ac:name="title">{inner_text.strip()}</ac:parameter>
+            # </ac:structured-macro>
+            #  {cleaned_text}
+            # </ac:rich-text-body>
+            # </ac:structured-macro>'''.strip()
         def repl(match):
             full_tag, external_id, inner_text = match.group(1), match.group(2), match.group(3)
             result = get_tooltip_panel_content(external_id)
-            print("result12",result)
             if not result:
                 return match.group(0)
-            if not inner_text and result.strip().startswith("<ac:image"):
-                return result
-            if inner_text and result.strip().startswith("<ac:image"):
-                return f"{inner_text}{result}"
+
             tooltip_text = html_to_tooltip_text(result)
             cleaned_text = tooltip_text.replace("<em>", "").replace("</em>", "").replace("'", "")
-#             return f'''
-# <ac:structured-macro ac:name="tooltip" ac:schema-version="1">
-#   <ac:parameter ac:name="linkText">{inner_text.strip()}</ac:parameter>
-#   <ac:rich-text-body>
-#     {cleaned_text}
-#   </ac:rich-text-body>
-# </ac:structured-macro>
-# '''.strip()
+            cleaned_text = sync_hidden_links_with_shared_pages_using_data(cleaned_text, data)
 
-            def generate_id(length=8):
-                return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+            # Check if content is only an <ac:image> (even wrapped inside <p>)
+            soup = BeautifulSoup(cleaned_text, "html.parser")
+            only_img = (
+                len(soup.contents) == 1 and
+                soup.contents[0].name == "p" and
+                len(soup.contents[0].contents) == 1 and
+                getattr(soup.contents[0].contents[0], 'name', '') == 'ac:image'
+            )
 
-            outer_local_id = generate_id()
-            outer_macro_id = generate_id()
-            inner_local_id = generate_id()
-            inner_macro_id = generate_id()
-            
-            print("inner_text_123",inner_text,"hello",cleaned_text)
-            print( image_title_map)
-            
+            if only_img:
+                return str(soup)  # Just return the image content, skip page creation
+
+            # Handle page creation for tooltip (non-image-only)
             def extract_image_title_from_macro(cleaned_text, image_title_map):
                 soup = BeautifulSoup(cleaned_text, "html.parser")
                 ri_tag = soup.find("ri:attachment")
@@ -448,34 +448,23 @@ def highlight_externalid(html_content):
                     item_id = filename.replace(".png", "")
                     return image_title_map.get(item_id, item_id)
                 return None
-            cleaned_text=sync_hidden_links_with_shared_pages_using_data(cleaned_text,data)
-            if "<ac:image" in cleaned_text:
-                inner_text = extract_image_title_from_macro(cleaned_text, image_title_map)
-                
-                print(inner_text,"inner_text")
-            print(inner_text,"hihello",cleaned_text)
-            return f'''<ac:structured-macro ac:name="rw-ui-tabs-macro" ac:schema-version="1" data-layout="default" ac:local-id="{outer_local_id}" ac:macro-id="{outer_macro_id}">
-            <ac:rich-text-body>
-            <ac:structured-macro ac:name="rw-tab" ac:schema-version="1" data-layout="default" ac:local-id="{inner_local_id}" ac:macro-id="{inner_macro_id}">
-            <ac:parameter ac:name="title">{inner_text.strip()}</ac:parameter>
-            </ac:structured-macro>
-             {cleaned_text}
-            </ac:rich-text-body>
-            </ac:structured-macro>'''.strip()
-#             return f'''
-# <ac:structured-macro ac:name="tooltip" ac:schema-version="1">
-#   <ac:parameter ac:name="linkText">{inner_text.strip()}</ac:parameter>
-#   <ac:rich-text-body>
-#     {cleaned_text}
-#   </ac:rich-text-body>
-# </ac:structured-macro>
-# '''.strip()
+
+            # if "<ac:image" in cleaned_text:
+            #     inner_text = extract_image_title_from_macro(cleaned_text, image_title_map)
+            
+            img_page = get_page_by_title(image_hub_space_key, inner_text)
+            if not img_page:
+                page = get_page_by_title(tooltip_space_key, inner_text)
+                if not page:
+                    page_id = create_page(tooltip_space_key, inner_text, cleaned_text)
+                return f'<ac:link><ri:page ri:content-title="{inner_text.strip()}" ri:space-key={tooltip_space_key} /><ac:plain-text-link-body><![CDATA[{inner_text}]]></ac:plain-text-link-body></ac:link>'
 
         return pattern.sub(repl, html_content)
 
     except Exception as e:
-        print("Error in highlight_externalid:", e)
+        print(e)
         return html_content
+
 
 def download_images_from_html_and_update_content(html_content):
     try:    
@@ -516,10 +505,8 @@ def extract_shared_content(data):
                     for field in fields:
                         if field.get("name") == "ParagraphTitle":
                             title_value = field.get("value").strip()
-                            print("title_value_test",title_value)
                         if field.get("name") == "Text":
                             value = field.get("value")
-                            print(value,title_value,"frtyf")
 
                     if title_value and value:
                         # Highlight external IDs (to process image macros)
@@ -528,13 +515,8 @@ def extract_shared_content(data):
 
                         # Process images in the shared paragraph text
                         value = download_images_from_html_and_update_content(value)
-                        print("value for image macro",value)
-                        # Check if an image exists in the value
                         if "<ac:image>" in value:
-                            # If an image exists, create a separate page for the image
-                            # Extract item_id from the image macro (we assume the item_id is part of the filename)
                             image_item_id = extract_item_id_from_image_macro(value)
-                            print("image_item_id",image_item_id)
                             if image_item_id:
                                 image_page_title = f"{image_item_id}"
                                 existing_image_page = get_page_by_title(image_hub_space_key,image_page_title)
@@ -555,15 +537,7 @@ def extract_shared_content(data):
                                     print(f"[i] Image page already exists: {image_page_title}")
                                 
                                 # Add the Include Page macro to include the image page
-                                include_page_macro = f'''
-<ac:structured-macro ac:name="include" ac:schema-version="1">
-  <ac:parameter ac:name="">
-    <ac:link>
-      <ri:page ri:space-key="{image_hub_space_key}" ri:content-title="{image_page_title}" />
-    </ac:link>
-  </ac:parameter>
-</ac:structured-macro>
-'''
+                                include_page_macro = f'<ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:space-key="{image_hub_space_key}" ri:content-title="{image_page_title}" /></ac:link></ac:parameter></ac:structured-macro>'
                                 # value += f"\n{include_page_macro}"
                             pattern = rf'<ac:image>.*?<ri:attachment ri:filename="{re.escape(image_item_id)}\.png".*?</ac:image>'
                             value = re.sub(pattern, include_page_macro, value, flags=re.DOTALL)
@@ -624,18 +598,8 @@ def includePagemacro(data):
                             clean_title=title_value.strip().strip('"')
                             existing_page=get_page_by_title(shared_paragraph_space_key,clean_title)
                             if existing_page:
-                                include_block = f'''
-<ac:structured-macro ac:name="include" ac:schema-version="1">
-  <ac:parameter ac:name="">
-    <ac:link>
-      <ri:page ri:space-key="{shared_paragraph_space_key}" ri:content-title="{clean_title}" />
-    </ac:link>
-  </ac:parameter>
-</ac:structured-macro>
-'''
+                                include_block = f'<ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:space-key="{shared_paragraph_space_key}" ri:content-title="{clean_title}" /></ac:link></ac:parameter></ac:structured-macro>'
                                 include_blocks += include_block
-                            else:
-                                print(f"Page '{title_value}' not found in Confluence.")
                     if "children" in child:
                         recurse_children(child["children"])
                 except Exception as e:
@@ -665,7 +629,7 @@ def collect_all_items(data):
 
 
 def sync_hidden_links_with_shared_pages_using_data(hidden_text, data):
-    print("sync")
+
     try:
         soup = BeautifulSoup(hidden_text or "", "html.parser")
         updated = False
@@ -680,9 +644,7 @@ def sync_hidden_links_with_shared_pages_using_data(hidden_text, data):
         # Step 2: Loop through all <a> tags with data-itemid
         for a_tag in soup.find_all("a", attrs={"data-itemid": True}):
             itemid = a_tag["data-itemid"]
-            print("itemid",itemid)
             anchor_text = a_tag.get_text(strip=True)
-            print("🔍 anchor_text:", anchor_text)
             
             # Step 3: Find matching item by ID
             match = None
@@ -693,7 +655,6 @@ def sync_hidden_links_with_shared_pages_using_data(hidden_text, data):
                     break
 
             if not match:
-                print(f"[!] No match found for itemid: {itemid}")
                 continue
             if detail.get("itemType") == "Document":
 
@@ -703,26 +664,14 @@ def sync_hidden_links_with_shared_pages_using_data(hidden_text, data):
                     title = next((f.get("value") for f in match.get("fields", []) if f.get("name") == "DocumentTitle"), None)
 
                 if not title:
-                    print(f"[!] No title for itemid: {itemid}")
                     continue
-
-                print("🔗 anchor title:", title)
-
-                # Step 5: Get the Confluence page
                 clean_title=title.strip().strip('"')
                 main_page = get_page_by_title(space_key, clean_title)
-                print("main_page",main_page)
                 if not main_page:
-                    print(title,"hello no page")
                     create_page(space_key, title,"To be migrated!")
                     
                 # Step 6: Replace the <a> with Confluence link macro
-                link_macro = f'''
-    <ac:link>
-    <ri:page ri:content-title="{clean_title}" ri:space-key="{space_key}" />
-    <ac:plain-text-link-body><![CDATA[{anchor_text}]]></ac:plain-text-link-body>
-    </ac:link>
-    '''
+                link_macro = f'<ac:link><ri:page ri:content-title="{clean_title}" ri:space-key="{space_key}" /><ac:plain-text-link-body><![CDATA[{anchor_text}]]></ac:plain-text-link-body></ac:link>'
                 a_tag.replace_with(BeautifulSoup(link_macro, "html.parser"))
                 updated = True
             elif detail.get("itemType") == "Link":
@@ -733,17 +682,11 @@ def sync_hidden_links_with_shared_pages_using_data(hidden_text, data):
                 link_title = next((f.get("value") for f in fields if f.get("name") == "LinkTitle"), anchor_text)
 
                 if not url:
-                    print(f"[!] No URL found for itemid: {itemid}")
                     continue
 
-                print(f"🔗 External link found for itemid {itemid}: {url}")
                 link_macro=f'<a href="{url}">{anchor_text}</a>'
-                print(link_macro,"4568")
-
                 a_tag.replace_with(BeautifulSoup(link_macro, "html.parser"))
                 updated = True
-                
-
         return str(soup) if updated else hidden_text
 
     except Exception as e:
@@ -790,27 +733,15 @@ def extract_content_from_fields(child):
             if field.get("name") == "Bookmark":
                  bookmark = field.get("value")  
                  if bookmark and bookmark != "Introduction" :
-                    anchor_macro = f"""
-        <ac:structured-macro ac:name="anchor">
-        <ac:parameter ac:name="">{bookmark}</ac:parameter>
-        </ac:structured-macro>
-        """
-                    print(anchor_macro)
+                    anchor_macro = f'<ac:structured-macro ac:name="anchor"><ac:parameter ac:name="">{bookmark}</ac:parameter></ac:structured-macro>'
                     html_parts.append(anchor_macro)
             if name == "LinkText":
                 link_text = value
-                print(link_text,"testing")
             elif name == "HiddenText":
                 value = fix_broken_links(value)
                 hidden_text = value
-                print(link_text,hidden_text,"testing")
-            # elif name == "HTMLText":
-            #     html_parts.append(value)
-            # elif name in ["Text", "VisibleText"] and value:
-            #     html_parts.append(value)
             elif name in ["Text", "VisibleText"] and value:
                 if 'data-itemid="' in value:
-                    print("📌 Found anchor with data-itemid inside Text, calling sync...")
                     value = sync_hidden_links_with_shared_pages_using_data(value, data)
                 html_parts.append(value)
 
@@ -820,7 +751,6 @@ def extract_content_from_fields(child):
 
         # Step 2: Clean and enhance hidden_text
         hidden_text = highlight_externalid(hidden_text)
-        print("sync")
         hidden_text = sync_hidden_links_with_shared_pages_using_data(hidden_text, data)
         hidden_text = download_images_from_html_and_update_content(hidden_text)
 
@@ -837,7 +767,8 @@ def extract_content_from_fields(child):
 
             existing_image_page = get_page_by_title(image_hub_space_key, image_page_title)
             if not existing_image_page:
-                image_page_content = f"<ac:image><ri:attachment ri:filename='{image_filename}'/></ac:image>"
+                print(image_filename,"785")
+                image_page_content = f'<ac:image ac:width="30" ac:height="30"><ri:attachment ri:filename="{image_filename}"/></ac:image>'
                 image_page_id = create_page(image_hub_space_key, image_page_title, image_page_content)
 
                 if os.path.exists(image_path):
@@ -848,15 +779,7 @@ def extract_content_from_fields(child):
                     update_page(image_page_id, image_page_title, image_page_content, current_version)
 
             # Replace image macro with include macro
-            include_macro = f"""
-<ac:structured-macro ac:name="include" ac:schema-version="1">
-  <ac:parameter ac:name="">
-    <ac:link>
-      <ri:page ri:space-key="{image_hub_space_key}" ri:content-title="{image_page_title}" />
-    </ac:link>
-  </ac:parameter>
-</ac:structured-macro>
-"""
+            include_macro = f'<ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:space-key="{image_hub_space_key}" ri:content-title="{image_page_title}" /></ac:link></ac:parameter></ac:structured-macro>'
             hidden_text = hidden_text.replace(macro, include_macro)
 
         # Step 4: Create the shared page if not exists
@@ -869,22 +792,7 @@ def extract_content_from_fields(child):
                 clean_html=color_formatter(hidden_text)
             create_page(shared_paragraph_space_key, clean_title,clean_html)
 
-        # Step 5: Wrap it with expand macro
-        print("link_text_demo",link_text)
-        expand_with_include = f"""
-<ac:structured-macro ac:name="expand">
-  <ac:parameter ac:name="title">{link_text}</ac:parameter>
-  <ac:rich-text-body>
-    <ac:structured-macro ac:name="include" ac:schema-version="1">
-      <ac:parameter ac:name="">
-        <ac:link>
-          <ri:page ri:space-key="{shared_paragraph_space_key}" ri:content-title="{clean_title}" />
-        </ac:link>
-      </ac:parameter>
-    </ac:structured-macro>
-  </ac:rich-text-body>
-</ac:structured-macro>
-"""
+        expand_with_include = f'<ac:structured-macro ac:name="expand"><ac:parameter ac:name="title">{link_text}</ac:parameter><ac:rich-text-body><ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:space-key="{shared_paragraph_space_key}" ri:content-title="{clean_title}" /></ac:link></ac:parameter></ac:structured-macro></ac:rich-text-body></ac:structured-macro>'
         html_parts.append(expand_with_include)
 
     except Exception as e:
@@ -893,9 +801,6 @@ def extract_content_from_fields(child):
 
 def replace_image_macros_with_include_pages(html_content):
     try:
-        print("replace_image_macros_with_include_pages")
-
-        from bs4 import BeautifulSoup
         soup = BeautifulSoup(html_content, 'html.parser')
 
         matches = []
@@ -906,12 +811,11 @@ def replace_image_macros_with_include_pages(html_content):
                 if filename.lower().endswith('.png'):
                     matches.append((filename, img_tag))
 
-        print("Image matches found:", [m[0] for m in matches])
-
         for filename, img_tag in matches:
             item_id = filename.replace(".png", "")
             image_page_title = f"{item_id}"
-            image_page_content = f"<ac:image><ri:attachment ri:filename='{filename}'/></ac:image>"
+            print(filename,"831")
+            image_page_content = f"<ac:image ac:width='10'><ri:attachment ri:filename='{filename}'/></ac:image>"
 
             # Create page
             image_page_id = create_page(image_hub_space_key, image_page_title, image_page_content)
@@ -925,15 +829,7 @@ def replace_image_macros_with_include_pages(html_content):
                     update_page(image_page_id, image_page_title, image_page_content, current_version)
 
             # Create include macro and replace
-            include_macro = f'''
-<ac:structured-macro ac:name="include" ac:schema-version="1">
-  <ac:parameter ac:name="">
-    <ac:link>
-      <ri:page ri:space-key="{image_hub_space_key}" ri:content-title="{image_page_title}" />
-    </ac:link>
-  </ac:parameter>
-</ac:structured-macro>
-'''.strip()
+            include_macro = f'<ac:structured-macro ac:name="include" ac:schema-version="1"><ac:parameter ac:name=""><ac:link><ri:page ri:space-key="{image_hub_space_key}" ri:content-title="{image_page_title}" /></ac:link></ac:parameter></ac:structured-macro>'.strip()
 
             img_tag.replace_with(BeautifulSoup(include_macro, "html.parser"))
 
@@ -992,14 +888,43 @@ def generate_confluence_storage_format(html_content, data):
         return None
 
 html_content = "\n".join(html_parts)
-# html_content= generate_confluence_storage_format(html_content, data)
 html_content = highlight_externalid(html_content)
 html_content = download_images_from_html_and_update_content(html_content)
-# print("html_content_before_replace",html_content)
 html_content = replace_image_macros_with_include_pages(html_content)
 html_content= generate_confluence_storage_format(html_content, data)
 
 soup = BeautifulSoup(html_content, 'html.parser')
+task_list_tag = soup.new_tag("ac:task-list")
+checkboxes = soup.find_all("input", {"type": "checkbox"})
+insert_position = checkboxes[0] if checkboxes else None
+items_to_remove = []
+
+for checkbox in checkboxes:
+    content = checkbox.next_sibling
+    while content and isinstance(content, str) and not content.strip():
+        content = content.next_sibling
+
+    if content and isinstance(content, str):
+        task_tag = soup.new_tag("ac:task")
+        status_tag = soup.new_tag("ac:task-status")
+        status_tag.string = "incomplete"
+        body_tag = soup.new_tag("ac:task-body")
+        body_tag.string = content.strip()
+        task_tag.append(status_tag)
+        task_tag.append(body_tag)
+        task_list_tag.append(task_tag)
+        items_to_remove.append(checkbox)
+        items_to_remove.append(content)
+
+if insert_position:
+    insert_position.insert_before(task_list_tag)
+
+for item in items_to_remove:
+    item.extract()
+
+for br in soup.find_all("br"):
+    br.decompose()
+    
 external_links = soup.find_all('a', class_='externallink')
 data_itemid = set()
 for link in external_links:
@@ -1021,8 +946,7 @@ for itemid in data_itemid:
                 itemid_to_conf[itemid] = title_1
         except ValueError:
             print("Failed to parse JSON.")
-    else:
-        print("page not exists",itemid)
+
 for link in external_links:
     itemid = link.get('data-itemid')
     anchor_text = link.text.strip().strip('"')
@@ -1040,10 +964,8 @@ for link in external_links:
         ac_link.append(link_body)  
         link.replace_with(ac_link)
 html_content = str(soup)   
-# Replace opening <b ...> with <strong ...>, excluding <br>, <button>, etc.
 html_content = re.sub(r'<\s*b(?=[\s>])', '<strong', html_content, flags=re.IGNORECASE)
 
-# Replace closing </b> with </strong>
 html_content = re.sub(r'<\s*/\s*b\s*>', '</strong>', html_content, flags=re.IGNORECASE)
 
 html_content = html_content.replace("<em>", '<span style="font-style: italic;">').replace("</em>", "</span>")
@@ -1057,84 +979,74 @@ try:
     clean_html=color_formatter(html_content)
     with open("test_output.html", "w", encoding="utf-8") as f:
         f.write(clean_html)
-    with open("cleaned_output.html","r",encoding="utf-8") as f:
-        clean_html=f.read()
     clean_title = title.strip().strip('"')
     page = get_page_by_title(space_key,clean_title)
     if not page:
-        # page_id = create_page(space_key, title, clean_html)
-        page_id = create_page(space_key, title, html_content)
+        page_id = create_page(space_key, title, clean_html)
         if page_id:
-            print(f"✅ Page created: {title}")
             keywords = data.get('meta', {}).get('keywords', '')
-            print("Keywords:", keywords)
-            if isinstance(keywords, str) and keywords.lower() != "null" and keywords.strip():
-                labels=[k.strip().replace(" ", "-") for k in keywords.split(",")]
-                print(labels)
+            tag_values = [tag.get("value") for tag in data.get("meta", {}).get("tags", []) if "value" in tag]
+            if (
+    (isinstance(keywords, str) and keywords.lower() != "null" and keywords.strip()) or
+    (isinstance(tag_values, list) and any(isinstance(t, str) and t.strip() for t in tag_values))):
+                tag_labels = [t.strip().replace(" ", "-") for t in tag_values if isinstance(t, str) and t.strip()]
+                keyword_labels = [k.strip().replace(" ", "-") for k in keywords.split(",") if k.strip()]
+                seen = set()
+                labels = []
+                for label in tag_labels + keyword_labels:
+                    if label not in seen:
+                        seen.add(label)
+                        labels.append(label)
                 def chunk_labels(label_list, size=15):
                     for i in range(0, len(label_list), size):
                         yield label_list[i:i + size]
                 def append_labels(page_id, labels):
                     for batch in chunk_labels(labels):
-                        print("batch",batch)
                         payload_1 = [{"prefix": "global", "name": label} for label in batch]
                         url = f"{confluence_url}/content/{page_id}/label"
                         response = requests.post(url, headers=headers, auth=auth, json=payload_1)
-                        if response.status_code == 200:
-                            print(f"Added batch: {batch}")
-                        else:
-                            print(f"Failed batch: {batch}")
-                            print(response.status_code, response.text)
                 append_labels(page_id, labels)
     else:
         page_id=page['id']
-        print(page,page_id,"test4t")
         current_version = get_current_version(page_id)
         if current_version is not None:
             update_page(page_id, title, clean_html, current_version)
-            print(f"🔄 Page updated: {title}")
             keywords = data.get('meta', {}).get('keywords', '')
-            print("Keywords:", keywords)
-            # if keywords != "null":
-            if isinstance(keywords, str) and keywords.lower() != "null" and keywords.strip():
-                labels=[k.strip().replace(" ", "-") for k in keywords.split(",")]
-                print(labels)
+            tag_values = [tag.get("value") for tag in data.get("meta", {}).get("tags", []) if "value" in tag]
+            if (
+    (isinstance(keywords, str) and keywords.lower() != "null" and keywords.strip()) or
+    (isinstance(tag_values, list) and any(isinstance(t, str) and t.strip() for t in tag_values))):
+                tag_labels = [t.strip().replace(" ", "-") for t in tag_values if isinstance(t, str) and t.strip()]
+                keyword_labels = [k.strip().replace(" ", "-") for k in keywords.split(",") if k.strip()]
+                seen = set()
+                labels = []
+                for label in tag_labels + keyword_labels:
+                    if label not in seen:
+                        seen.add(label)
+                        labels.append(label)
                 def chunk_labels(label_list, size=15):
                     for i in range(0, len(label_list), size):
                         yield label_list[i:i + size]
                 def append_labels(page_id, labels):
                     for batch in chunk_labels(labels):
-                        print("batch",batch)
                         payload_1 = [{"prefix": "global", "name": label} for label in batch]
                         url = f"{confluence_url}/content/{page_id}/label"
                         response = requests.post(url, headers=headers, auth=auth, json=payload_1)
-                        if response.status_code == 200:
-                            print(f"Added batch: {batch}")
-                        else:
-                            print(f"Failed batch: {batch}")
-                            print(response.status_code, response.text)
                 append_labels(page_id, labels)
-        else:
-            print(f"⚠️ Could not get version for {title}")
-
+            else:
+                print(f"Could not get version for {title}")
         uploaded = []
-
-        # STEP 2: Upload images
         for file in os.listdir(images_folder):
             file_path_full = os.path.join(images_folder, file)
             try:
-                print(file, "filepathname")
                 if file != "2e6d82ef-524c-ea11-a960-000d3ad095fb.png":
                     attach_file(page_id, file_path_full, file)
                     uploaded.append(file)
             except Exception as e:
                 print(f"Failed to upload {file}: {e}")
-
         current_version = get_current_version(page_id)
         if current_version:
             update_page(page_id, title, clean_html, current_version)
-
-        # STEP 3: Update tracking page
         try:
             track_title = "Document - Page Navigation"
             tracking_results = get_page_by_title(space_key,track_title)
