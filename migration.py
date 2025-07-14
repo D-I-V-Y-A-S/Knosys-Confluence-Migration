@@ -334,7 +334,6 @@ external_info_list = data.get("external", {}).get("information", [])
 info_lookup = {item["informationId"]: item for item in external_info_list if "informationId" in item}
 
 def generate_image_macro_img_1(filename):
-    print("filename123",filename)
     if filename == "2e6d82ef-524c-ea11-a960-000d3ad095fb.png":
         print(f"Skipped macro generation for: {filename}")
         return " "
@@ -378,6 +377,7 @@ def get_tooltip_panel_content(external_id):
                 item_id = img_tag["itemid"]
                 if item_id:
                     image_title_map[item_id] = entry.get("title", item_id)
+                    print(image_title_map,"380")
                     filepath = fetch_and_save_image(item_id)
                     if filepath:
                         return generate_image_macro_img_1(os.path.basename(filepath))
@@ -390,6 +390,7 @@ def get_tooltip_panel_content(external_id):
                 item_id = img_tag.get("itemid")
                 if item_id:
                     image_title_map[item_id] = entry.get("title", item_id)
+                    print(image_title_map,"393")
                     filepath = fetch_and_save_image(item_id)
                     if filepath:
                         return generate_image_macro_img_1(os.path.basename(filepath))
@@ -517,7 +518,10 @@ def extract_shared_content(data):
                             # Extract item_id from the image macro (we assume the item_id is part of the filename)
                             image_item_id = extract_item_id_from_image_macro(value)
                             if image_item_id:
-                                image_page_title = f"{image_item_id}"
+                                # image_page_title = f"{image_item_id}"
+                                
+                                image_page_title=image_title_map[image_item_id].strip().strip('"')
+                                print(image_title_map,"524")
                                 existing_image_page = get_page_by_title(image_hub_space_key,image_page_title)
                                 if not existing_image_page:
                                     image_page_content = f'<ac:image><ri:attachment ri:filename="{image_item_id}.png"/></ac:image>'
@@ -805,14 +809,17 @@ def extract_content_from_fields(child):
                 continue
 
             image_filename = f"{item_id}.png"
-            image_page_title = f"{item_id}"
+            if image_filename == "60a2a47c-7e53-ea11-a961-000d3ad095fb.png":
+                image_page_title="End of system instructions"
+            else:
+                image_page_title=image_filename
             image_path = os.path.join(images_folder, image_filename)
 
             existing_image_page = get_page_by_title(image_hub_space_key, image_page_title)
             if not existing_image_page:
                 image_page_content = f'<ac:image ac:width="30" ac:height="30"><ri:attachment ri:filename="{image_filename}"/></ac:image>'
                 image_page_id = create_page(image_hub_space_key, image_page_title, image_page_content,img_space_id)
-
+                
                 if os.path.exists(image_path):
                     attach_file(image_page_id, image_path, image_filename)
 
@@ -881,6 +888,7 @@ def replace_image_macros_with_include_pages(html_content):
         for filename, img_tag in matches:
             item_id = filename.replace(".png", "")
             image_page_title = f"{item_id}"
+            
             image_page_content = f'<ac:image ac:width="30" ac:height="30"><ri:attachment ri:filename="{filename}"/></ac:image>'
 
             # Create page
@@ -968,6 +976,7 @@ html_content = replace_image_macros_with_include_pages(html_content)
 html_content= generate_confluence_storage_format(html_content, data)
 
 soup = BeautifulSoup(html_content, 'html.parser')
+task_list_tag = soup.new_tag("ac:task-list")
 checkboxes = soup.find_all("input", {"type": "checkbox"})
 insert_position = checkboxes[0] if checkboxes else None
 items_to_remove = []
@@ -1055,7 +1064,6 @@ try:
 
     clean_title = title.strip().strip('"')
     page = get_page_by_title(space_key, clean_title)
-    print(page, clean_title)
 
     if not page:
         page_id = create_page(space_key, clean_title, clean_html, space_id)
