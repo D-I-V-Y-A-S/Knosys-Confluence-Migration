@@ -14,6 +14,8 @@ import binascii
 from Crypto.Hash import SHA256, HMAC
 import random
 import string
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
   
 load_dotenv()
 images_folder = "images"
@@ -22,7 +24,7 @@ shared_paragraph_space_key=os.getenv("shared_paragraph_space_key")
 image_hub_space_key=os.getenv("image_hub_space_key")
 conf_doc_page=os.getenv("Base_url")
 tooltip_space_key=os.getenv("tooltip_space_key")
-
+tooltip_space_id=os.getenv("tooltip_space_id")
 #credentials for authentication
 BASE_URL = "https://rest.opt.knoiq.co/api/v1"
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN_1")
@@ -30,13 +32,11 @@ SITE_ID = os.getenv("SITE_ID")
 USER_TYPE = "Admin" 
 SECRET_KEY = os.getenv("SECRET_KEY")
 knosys_crt=os.getenv("crt_path")
-print(knosys_crt,"Knosys cert here")
 Conf_crt=os.getenv("confluence_crt")
 space_id=os.getenv("space_id")
 img_space_id=os.getenv("img_space_id")
 image_hub_space_key=os.getenv("image_hub_space_key")
 shared_paragraph_space_key=os.getenv("shared_paragraph_space_key")
-print(img_space_id, "Image space ID should be here")
 shared_space_id=os.getenv("Shared_space_id")
 access_token =  os.getenv("access_token")
 cloud_id = os.getenv("cloud_id")
@@ -56,7 +56,7 @@ def get_auth_challenge():
             "userType": USER_TYPE
         }
         headers = {"Content-Type": "application/json"}
-        response = requests.post(url, json=payload, headers=headers, verify=knosys_crt)
+        response = requests.post(url, json=payload, headers=headers, verify=False)
         if response.status_code == 200:
             challenge_token = response.json().get("challengeString")
             return challenge_token
@@ -85,7 +85,7 @@ def get_auth_token(challenge_token, signature):
             "signature": signature
         }
         headers = {"Content-Type": "application/json"}
-        response = requests.post(url, json=payload, headers=headers, verify=knosys_crt)
+        response = requests.post(url, json=payload, headers=headers, verify=False)
         if response.status_code == 200:
             auth_token = response.json().get("token")
             print(auth_token)
@@ -111,22 +111,22 @@ source_url=os.getenv("source_url")
 headers_2={"Content-Type":"application/json", "Authorization":f"Bearer {auth_token}"}
 
 #get author email from knosys
-def getuserEmail(created_by):
-    with open("users.json", "r") as f:
-        email_map = json.load(f)
-    def get_confluence_email(kiq_email):
-        return email_map.get(kiq_email, "Not found")
-    return get_confluence_email(created_by)
+# def getuserEmail(created_by):
+#     with open("users.json", "r") as f:
+#         email_map = json.load(f)
+#     def get_confluence_email(kiq_email):
+#         return email_map.get(kiq_email, "Not found")
+#     return get_confluence_email(created_by)
 
 #fetch_documents
-response=requests.get(source_url,headers=headers_2,verify=Conf_crt)
+response=requests.get(source_url,headers=headers_2,verify=False)
 if response.status_code == 200:
     try:
         data = response.json()
         fields = data.get("fields", []) 
         Document_Id = data['detail']['id']
         Created_by=data['detail']['createdByPerson']
-        confluence_email=getuserEmail(Created_by)
+        confluence_email="divya.s@cprime.com"
         title = data['detail']['title']
         print("Document Title:", title)
     except ValueError:
@@ -243,7 +243,7 @@ def color_formatter(html_content):
 def get_page_by_title(space_key,title):
     try:
         url = f"https://api.atlassian.com/ex/confluence/{cloud_id}/wiki/api/v2/pages?title={title}&spaceKey={space_key}"
-        response = requests.get(url, headers=headers_1,verify=Conf_crt)
+        response = requests.get(url, headers=headers_1,verify=False)
         if response.status_code == 200 and response.json()["size"] > 0:
             # print(response.status_code,"-->",response.text)
             return response.json()["results"][0]
@@ -254,7 +254,7 @@ def get_page_by_title(space_key,title):
 
 def get_current_version(page_id):
     url = f"https://api.atlassian.com/ex/confluence/{cloud_id}/wiki/api/v2/pages/{page_id}"
-    resp = requests.get(url, headers=headers_1,verify=Conf_crt)
+    resp = requests.get(url, headers=headers_1,verify=False)
     if resp.status_code == 200:
         return resp.json()['version']['number']
     else:
@@ -276,13 +276,12 @@ def create_page(space_key, title, content,curr_space_id):
   }
     }
     try:
-        response = requests.post(url, headers=headers_1, data=json.dumps(data),verify=Conf_crt)
+        response = requests.post(url, headers=headers_1, data=json.dumps(data),verify=False)
         if(response.status_code==200):
             response_json = response.json()
             # print(response.status_code,"-->",response.text)
             created_page_Id=response_json.get("id")
             return created_page_Id
-        else:
     except Exception as e:
         print(e)
 
@@ -300,7 +299,7 @@ def attach_file(page_id, file_path, file_name):
         files = {
             'file': (file_name, f, 'image/png')
         }
-        response = requests.post(upload_url, headers=headers_no_json, files=files,verify=Conf_crt)
+        response = requests.post(upload_url, headers=headers_no_json, files=files,verify=False)
     try:
         if response.status_code == 200 or response.status_code == 201:
             return response.json()
@@ -323,7 +322,7 @@ def update_page(page_id, title, html_content, current_version):
                     "representation": "storage"
             }
         }
-        response = requests.put(url, headers=headers_1, data=json.dumps(data),verify=Conf_crt)
+        response = requests.put(url, headers=headers_1, data=json.dumps(data),verify=False)
         if(response.status_code == 200):
             # print(response.status_code,"-->",response.text)
             print("page updated")
@@ -361,7 +360,7 @@ def get_tooltip_panel_content(external_id):
 
         def fetch_and_save_image(item_id):
             url = f'https://rest.opt.knoiq.co/api/v2/resources/images/{item_id}'
-            response = requests.get(url, headers=headers_2,verify=knosys_crt)
+            response = requests.get(url, headers=headers_2,verify=False)
 
             if response.status_code == 200:
                 os.makedirs(images_folder, exist_ok=True)
@@ -447,7 +446,7 @@ def highlight_externalid(html_content):
                 inner_text_clean = inner_text.strip()
                 page = get_page_by_title(tooltip_space_key, inner_text_clean)
                 if not page:
-                    page_id = create_page(tooltip_space_key, inner_text_clean, cleaned_text)
+                    page_id = create_page(tooltip_space_key, inner_text_clean, cleaned_text,tooltip_space_id)
 
                 return (
                     f'<ac:link>'
@@ -471,7 +470,7 @@ def download_images_from_html_and_update_content(html_content):
             if not item_id:
                 continue
             url = f'https://rest.opt.knoiq.co/api/v2/resources/images/{item_id}'
-            response = requests.get(url, headers=headers_2,verify=knosys_crt)
+            response = requests.get(url, headers=headers_2,verify=False)
             if response.status_code == 200:
                 os.makedirs(images_folder, exist_ok=True)
                 filename = f"{item_id}.png"
@@ -811,7 +810,7 @@ def extract_content_from_fields(child):
 
             existing_image_page = get_page_by_title(image_hub_space_key, image_page_title)
             if not existing_image_page:
-                image_page_content = f"<ac:image><ri:attachment ri:filename='{image_filename}'/></ac:image>"
+                image_page_content = f'<ac:image ac:width="30" ac:height="30"><ri:attachment ri:filename="{image_filename}"/></ac:image>'
                 image_page_id = create_page(image_hub_space_key, image_page_title, image_page_content,img_space_id)
 
                 if os.path.exists(image_path):
@@ -882,7 +881,7 @@ def replace_image_macros_with_include_pages(html_content):
         for filename, img_tag in matches:
             item_id = filename.replace(".png", "")
             image_page_title = f"{item_id}"
-            image_page_content = f"<ac:image><ri:attachment ri:filename='{filename}'/></ac:image>"
+            image_page_content = f'<ac:image ac:width="30" ac:height="30"><ri:attachment ri:filename="{filename}"/></ac:image>'
 
             # Create page
             image_page_id = create_page(image_hub_space_key, image_page_title, image_page_content,img_space_id)
@@ -1008,7 +1007,7 @@ for link in external_links:
 itemid_to_conf={}
 for itemid in data_itemid:
     pagefetch_url=f"https://rest.opt.knoiq.co/api/v2/admin/documents/{itemid}"
-    response=requests.get(pagefetch_url,headers=headers_2,verify=knosys_crt)
+    response=requests.get(pagefetch_url,headers=headers_2,verify=False)
     if response.status_code == 200:
         try:
             data = response.json()
@@ -1039,7 +1038,6 @@ for link in external_links:
         ac_link.append(link_body)  
         link.replace_with(ac_link)
 html_content = str(soup)   
-# Replace problematic tags with safe <span> equivalents
 
 html_content = html_content.replace("<b","<strong").replace("</b>", "</strong>")
 # html_content = html_content.replace("<i>", '<span style="font-style: italic;">').replace("</i>", "</span>")
@@ -1086,7 +1084,7 @@ try:
                     for batch in chunk_labels(labels):
                         payload_1 = [{"prefix": "global", "name": label} for label in batch]
                         url = f"https://api.atlassian.com/ex/confluence/{cloud_id}/wiki/rest/api/content/{page_id}/label"
-                        response = requests.post(url, headers=headers, json=payload_1, verify=Conf_crt)
+                        response = requests.post(url, headers=headers, json=payload_1, verify=False)
                         if response.status_code == 200:
                             print(f"Added batch: {batch}")
                         else:
@@ -1125,7 +1123,7 @@ try:
                     for batch in chunk_labels(labels):
                         payload_1 = [{"prefix": "global", "name": label} for label in batch]
                         url = f"https://api.atlassian.com/ex/confluence/{cloud_id}/wiki/rest/api/content/{page_id}/label"
-                        response = requests.post(url, headers=headers, json=payload_1, verify=Conf_crt)
+                        response = requests.post(url, headers=headers, json=payload_1, verify=False)
                         if response.status_code == 200:
                             print(f"Added batch: {batch}")
                         else:
@@ -1138,11 +1136,8 @@ try:
 
     uploaded = []
 
-except Exception as e:
-    print("❌ Error:", str(e))
-
         # STEP 2: Upload images
-        for file in os.listdir(images_folder):
+    for file in os.listdir(images_folder):
             file_path_full = os.path.join(images_folder, file)
             try:
                 if file != "2e6d82ef-524c-ea11-a960-000d3ad095fb.png":
@@ -1151,12 +1146,12 @@ except Exception as e:
             except Exception as e:
                 print(f"Failed to upload {file}: {e}")
 
-        current_version = get_current_version(page_id)
-        if current_version:
+    current_version = get_current_version(page_id)
+    if current_version:
             update_page(page_id, title, clean_html, current_version)
 
         # STEP 3: Update tracking page
-        try:
+    try:
             track_title = "Document - Page Navigation"
             tracking_results = get_page_by_title(space_key,track_title)
             if tracking_results:
@@ -1165,7 +1160,7 @@ except Exception as e:
                 current_version = tracking_page['version']['number']
 
                 url = f"https://api.atlassian.com/ex/confluence/{cloud_id}/wiki/api/v2/pages/{page_id_track}?body-format=storage"
-                response = requests.get(url, headers=headers,verify=Conf_crt)
+                response = requests.get(url, headers=headers,verify=False)
                 current_body = response.json()["body"]["storage"]["value"]
 
                 new_row = f'''
@@ -1187,7 +1182,7 @@ except Exception as e:
                     print("Tracking page updated with new document entry.")
                 else:
                     print("</tbody> not found — is the table structured correctly?")
-        except Exception as e:
+    except Exception as e:
             print(f"Failed to update tracking page: {e}")
 
 except Exception as e:
